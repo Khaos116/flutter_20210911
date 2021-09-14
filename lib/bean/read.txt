@@ -1,0 +1,10 @@
+1.导包:
+dependencies:
+  dart_json_mapper: ^2.1.10
+dev_dependencies:
+  build_runner: ^2.1.2
+  built_value_generator: ^8.1.2
+2.修改反射字段后需要运行以下命令进行编译
+    flutter packages pub run build_runner build DIR
+3.在void main()方法中初始化
+    initializeReflectable();
