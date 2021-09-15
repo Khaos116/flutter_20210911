@@ -1,8 +1,10 @@
 import 'package:dart_json_mapper/dart_json_mapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_20210911/base/base_state_page.dart';
 import 'package:flutter_20210911/bean/time_bean.dart';
+import 'package:flutter_20210911/utils/regexp_utils.dart';
 import 'package:flutter_20210911/utils/time_utils.dart';
 import 'package:flutter_20210911/utils/toast_utils.dart';
 
@@ -59,13 +61,29 @@ class _FirstPage extends BaseStatefulState {
                         color: Colors.cyan.shade200,
                       )),
                   Expanded(
-                      child: SizedBox(
-                    height: 40.0,
+                      child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 35.0),
                     child: TextField(
                       controller: _controller,
                       focusNode: _focusNode,
+                      inputFormatters: [
+                        //长度限制限制
+                        LengthLimitingTextInputFormatter(150),
+                        //限制单行
+                        FilteringTextInputFormatter.singleLineFormatter,
+                        //只能输入数字
+                        //FilteringTextInputFormatter.digitsOnly,
+                        //自定义输入限制
+                        IgnoreOtherFormatter(),
+                      ],
                       style: const TextStyle(fontSize: 14.0),
-                      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: '请输入用户名'),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                        border: OutlineInputBorder(),
+                        hintText: '请输入用户名',
+                        filled: true,
+                        fillColor: Color(0xffF5F5F5),
+                      ),
                     ),
                   ))
                 ],
@@ -125,8 +143,8 @@ class _FirstPage extends BaseStatefulState {
       if (response.statusCode == 200) {
         //QZOutputJson={'s':'o','t':1631339067,'ip':'103.109.71.37','pos':'---','rand':'7jBwIVnTkm27cPIMHeY2dw=='};
         String temp = response.toString();
-        _response = temp.substring(temp.indexOf('{'), temp.lastIndexOf('}') + 1);
         try {
+          _response = temp.substring(temp.indexOf('{'), temp.lastIndexOf('}') + 1);
           // var map = json.decode(_response);
           var bean = JsonMapper.deserialize<TimeBean>(_response);
           if (bean == null) {
